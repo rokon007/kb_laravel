@@ -15,6 +15,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use App\Traits\Likeable;
 use App\Traits\Followable;
 use App\Traits\HasWallet;
+use App\Models\Wallet;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements HasMedia, MustVerifyEmail
 {
@@ -187,6 +189,11 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     public function advertiserWallet()
     {
         return $this->hasOne(Wallet::class)->where('type', 'advertiser');
+    }
+
+    public function wallets(): HasMany
+    {
+        return $this->hasMany(Wallet::class);
     }
 
     /**
