@@ -24,6 +24,35 @@ class UserController extends Controller
     /**
      * Update user profile
      */
+    // public function updateProfile(Request $request)
+    // {
+    //     $request->validate([
+    //         'name' => 'sometimes|string|max:255',
+    //         'bio' => 'sometimes|string|max:500',
+    //         'date_of_birth' => 'sometimes|date|before:today',
+    //         'gender' => 'sometimes|in:male,female,other',
+    //         'location' => 'sometimes|string|max:255',
+    //     ]);
+
+    //     $user = $request->user();
+    //     $user->update($request->only([
+    //         'name',
+    //         'bio',
+    //         'date_of_birth',
+    //         'gender',
+    //         'location',
+    //     ]));
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Profile updated successfully',
+    //         'data' => $user,
+    //     ]);
+    // }
+
+    /**
+     * Update user profile
+     */
     public function updateProfile(Request $request)
     {
         $request->validate([
@@ -32,21 +61,31 @@ class UserController extends Controller
             'date_of_birth' => 'sometimes|date|before:today',
             'gender' => 'sometimes|in:male,female,other',
             'location' => 'sometimes|string|max:255',
+            'avatar' => 'sometimes|image|mimes:jpeg,png,jpg,gif,webp|max:5048', // 5MB max
         ]);
 
         $user = $request->user();
-        $user->update($request->only([
+
+        $data = $request->only([
             'name',
             'bio',
             'date_of_birth',
             'gender',
             'location',
-        ]));
+        ]);
+
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = '/storage/' . $path; // অথবা asset() দিয়ে URL জেনারেট করতে পারো
+        }
+
+        $user->update($data);
 
         return response()->json([
             'success' => true,
             'message' => 'Profile updated successfully',
-            'data' => $user,
+            'data' => $user->fresh(), // রিফ্রেশ করে লেটেস্ট ডাটা পাঠাও
         ]);
     }
 
